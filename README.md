@@ -69,6 +69,13 @@ for (int i = 0; i < numMatches; i++) {
     std::cout << std::endl;
 }
 
+/*
+Output:
+# 3: distance = 1 (-1,0)
+# 0: distance = 1 (0,1)
+# 1: distance = 1.41421 (1,1)
+*/
+
 auto batch = t1.getNearestNeighborsBatch({{0, 0}, {1, 1}, {0.5, 0.5}}, 3); // split the work between threads
 batch.first[0] == distances // true
 batch.second[0] == indices // true
