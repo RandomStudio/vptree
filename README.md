@@ -45,26 +45,33 @@ make test
 
 ### C++
 ```c++
-auto points = std::vector<std::vector<double>>{
-    {0, 0, 1},
-    {1, 1, 1},
-    {2, 0, 0},
-    {-1, -1, 0},
-    {10, 0, 5}
-};
+ auto points = std::vector<std::vector<double>>{
+        {0, 1},
+        {1, 1},
+        {2, 0},
+        {-1, 0},
+        {10, 5}
+    };
 
-vpt::VpTree t1(points); // create a tree
 
-std::vector<double> distances;
-std::vector<int> indices;
-std::tie(distances, indices) = t1.getNearestNeighbors({ 0, 0, 0 }, 3); // find 3 neighbors closest to the given point
+    vpt::VpTree t1(points); // create a tree
 
-std::cout << distances[0] << "\n"; // prints 0
-std::cout << indices[0] << "\n"; // prints 1
+    std::vector<double> distances;
+    std::vector<int> indices;
 
-auto batch = t1.getNearestNeighborsBatch({{0, 0, 0}, {1, 1, 1}, {0.5, 0.5, 0.5}}, 3); // split the work between threads
-batch.first[0] == distances // true
-batch.second[0] == indices // true
+    int numMatches = 3;
+
+    std::tie(distances, indices) = t1.getNearestNeighbors({ 0, 0 }, numMatches); // find 3 neighbors closest to the given point
+
+    for (int i = 0; i < numMatches; i++) {
+        std::cout << "# " << indices[i] << ": distance = " << distances[i];
+        std::cout << " (" << points[indices[i]][0] << "," << points[indices[i]][1] << ")";
+        std::cout << std::endl;
+    }
+    
+    auto batch = t1.getNearestNeighborsBatch({{0, 0}, {1, 1}, {0.5, 0.5}}, 3); // split the work between threads
+    batch.first[0] == distances // true
+    batch.second[0] == indices // true
 
 ```
 ### Python
