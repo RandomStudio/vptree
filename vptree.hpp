@@ -154,11 +154,11 @@ VpTree::VpTree(const Container& container, Metric metric)
 : VpTree(container.begin(), container.end(), metric)
 { }
 
-VpTree::VpTree(std::initializer_list<Vector> list, Metric metric)
+inline VpTree::VpTree(std::initializer_list<Vector> list, Metric metric)
 : VpTree(list.begin(), list.end(), metric)
 { }
 
-int VpTree::makeTree(int lower, int upper) {
+inline int VpTree::makeTree(int lower, int upper) {
     if (lower >= upper) {
         return Node::Leaf;
     } else if (lower + 1 == upper) {
@@ -175,13 +175,13 @@ int VpTree::makeTree(int lower, int upper) {
     }
 }
 
-void VpTree::selectRoot(int lower, int upper) {
+inline void VpTree::selectRoot(int lower, int upper) {
     std::uniform_int_distribution<int> uni(lower, upper - 1);
     int root = uni(rng_);
     std::swap(items_[lower], items_[root]);
 }
 
-void VpTree::partitionByDistance(int lower, int pos, int upper) {
+inline void VpTree::partitionByDistance(int lower, int pos, int upper) {
     std::nth_element(
         items_.begin() + lower + 1,
         items_.begin() + pos,
@@ -191,7 +191,7 @@ void VpTree::partitionByDistance(int lower, int pos, int upper) {
         });
 }
 
-int VpTree::makeNode(int item) {
+inline int VpTree::makeNode(int item) {
     nodes_.push_back(Node(item));
     return nodes_.size() - 1;
 }
@@ -222,11 +222,11 @@ DistancesIndices VpTree::getNearestNeighbors(const VectorLike& target, int neigh
     return getNearestNeighbors(Vector(target.begin(), target.end()), neighborsCount);
 }
 
-DistancesIndices VpTree::getNearestNeighbors(std::initializer_list<double> target, int neighborsCount) const {
+inline DistancesIndices VpTree::getNearestNeighbors(std::initializer_list<double> target, int neighborsCount) const {
     return getNearestNeighbors(Vector(target.begin(), target.end()), neighborsCount);
 }
 
-DistancesIndices VpTree::getNearestNeighbors(const Vector& target, int neighborsCount) const {
+inline DistancesIndices VpTree::getNearestNeighbors(const Vector& target, int neighborsCount) const {
     auto targetDimension = target.size();
     if (targetDimension != dimension_) {
         throw DimensionMismatch(dimension_, targetDimension);
@@ -246,16 +246,16 @@ BatchDistancesIndices VpTree::getNearestNeighborsBatch(const Container& targets,
     return BatchDistancesIndices(batchDistances, batchIndices);
 }
 
-BatchDistancesIndices VpTree::getNearestNeighborsBatch(std::initializer_list<Vector> targets, int neighborsCount) const {
+inline BatchDistancesIndices VpTree::getNearestNeighborsBatch(std::initializer_list<Vector> targets, int neighborsCount) const {
     return getNearestNeighborsBatch(std::vector<Vector>(targets.begin(), targets.end()), neighborsCount);
 }
 
 
-Searcher::Searcher(const VpTree* tree, const Vector& target, int neighborsCount)
+inline Searcher::Searcher(const VpTree* tree, const Vector& target, int neighborsCount)
 : tree_(tree), target_(target), neighborsCount_(neighborsCount), tau_(std::numeric_limits<double>::max()), heap_()
 { }
 
-DistancesIndices Searcher::search() {
+inline DistancesIndices Searcher::search() {
     searchInNode(tree_->root());
 
     DistancesIndices results;
@@ -269,7 +269,7 @@ DistancesIndices Searcher::search() {
     return results;
 }
 
-void Searcher::searchInNode(const Node& node) {
+inline void Searcher::searchInNode(const Node& node) {
     double dist = tree_->getDistance(tree_->items_[node.item].first, target_);
 
     if (dist < tau_) {
